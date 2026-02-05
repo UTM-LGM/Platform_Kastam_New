@@ -110,7 +110,7 @@ namespace Platform_Kastam.Controllers
         }
 
         [HttpPost("DownloadFileKastam")]
-        public IActionResult DownloadFileKastam()
+        public async Task<IActionResult> DownloadFileKastam()
         {
             // --- TARGET SETTINGS (Where the files go) ---
             string localBaseDir = @"C:\RootFolderKastam"; // Change this to your local path
@@ -158,6 +158,16 @@ namespace Platform_Kastam.Controllers
                     }
 
                     client.Disconnect();
+                }
+
+                // ✅ SEND EMAIL AFTER DOWNLOAD SUCCESS
+                if (downloadedCount > 0)
+                {
+                    MailRequest mailrequest = new MailRequest();
+                    mailrequest.ToEmail = "syahmirahim99@gmail.com";
+                    mailrequest.Subject = "[Notifikasi Data Kastam] - Fail Kastam Berjaya Dimuatnaik";
+                    mailrequest.Body = this.GetHtmlContent();
+                    await emailService.SendEmailByService(mailrequest);
                 }
 
                 return Ok(new
